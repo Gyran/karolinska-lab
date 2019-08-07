@@ -15,7 +15,7 @@ const populate = async () => {
     }
   }))).filter((lab) => lab);
 
-  await fsPromises.writeFile(path.join(__dirname, '/data/labs.json'), JSON.stringify(labs));
+  console.log(JSON.stringify(labs))
 };
 
 populate();

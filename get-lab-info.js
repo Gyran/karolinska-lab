@@ -1,8 +1,8 @@
 const cheerio = require('cheerio')
-const get = require('./get');
+const got = require('got');
 
 const _getMetaTagContent = ($, name) => {
-  return $(`meta[name="${ name }"]`).attr('content');
+  return $(`meta[property="${name}"]`).attr('content');
 };
 
 const _ensureHttps = (url) => {
@@ -13,23 +13,20 @@ const _ensureHttps = (url) => {
 };
 
 const getLabInfo = async (labUrl) => {
-  const karolinskaHtml = await get(labUrl);
+  const karolinskaHtml = (await got(labUrl)).body;
   const $karolinska = cheerio.load(karolinskaHtml)
 
   const vardguidenUrl = _ensureHttps($karolinska('#main > article > div.organization-info > div.organization-info__block.organization-info__location > a').attr('href'));
 
-  console.log('labUrl', labUrl);
-  console.log('vardguidenUrl', vardguidenUrl);
-
-  const vardguidenHtml = await get(vardguidenUrl);
+  const vardguidenHtml = (await got(vardguidenUrl)).body;
   const $vardguiden = cheerio.load(vardguidenHtml);
 
   return {
     name: _getMetaTagContent($vardguiden, 'hsa.name'),
-    telephonenumber: _getMetaTagContent($vardguiden, 'hsa.telephonenumber'),
+    telephonenumber: $vardguiden('#hours > div > div > div.contact-card__content__inner.animation > div > div.main-info > div:nth-child(1) > div > a > span').text(),
     visitingaddress: _getMetaTagContent($vardguiden, 'hsa.visitingaddress'),
-    latitude: _getMetaTagContent($vardguiden, 'hsa.Latitude'),
-    longitude: _getMetaTagContent($vardguiden, 'hsa.Longitude'),
+    latitude: _getMetaTagContent($vardguiden, 'hsa.latitude'),
+    longitude: _getMetaTagContent($vardguiden, 'hsa.longitude'),
   };
 
   //

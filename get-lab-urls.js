@@ -1,11 +1,10 @@
 const cheerio = require('cheerio')
-
-const get = require('./get');
+const got = require('got');
 
 const LIST_URL = 'https://www.karolinska.se/for-patienter/karolinska-universitetslaboratoriet/alla-provtagningsenheter-a-o/';
 
 const getLabUrls = async () => {
-  const html = await get(LIST_URL);
+  const html = (await got(LIST_URL)).body;
   const $ = cheerio.load(html)
 
   const labUrls = [];
@@ -18,7 +17,7 @@ const getLabUrls = async () => {
       labUrls.push(labUrl.href);
     });
 
-    return labUrls;
+  return labUrls;
 };
 
 module.exports = getLabUrls;
